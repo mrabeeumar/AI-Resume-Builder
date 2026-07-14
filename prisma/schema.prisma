@@ -7,6 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model RateLimitCounter {
+  key       String   @id
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("rate_limit_counters")
+}
+
+model AtsReportCache {
+  key       String   @id
+  payload   String   @db.NVarChar(Max)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("ats_report_cache")
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
