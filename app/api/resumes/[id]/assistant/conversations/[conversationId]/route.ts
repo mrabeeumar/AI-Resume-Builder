@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
-import { withRequestLog } from "@/lib/api-log";
 import {
   deleteConversation,
   getConversationWithMessages,
@@ -10,54 +9,48 @@ import {
 
 type RouteParams = { params: Promise<{ id: string; conversationId: string }> };
 
-export const GET = withRequestLog(
-  "GET /api/resumes/[id]/assistant/conversations/[conversationId]",
-  async (_request: Request, { params }: RouteParams) => {
-    const session = await auth();
+export async function GET(_request: Request, { params }: RouteParams) {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-    const { id, conversationId } = await params;
+  const { id, conversationId } = await params;
 
-    try {
-      const conversation = await getConversationWithMessages(
-        id,
-        conversationId,
-        session.user.id,
-      );
+  try {
+    const conversation = await getConversationWithMessages(
+      id,
+      conversationId,
+      session.user.id,
+    );
 
-      return NextResponse.json({ conversation });
-    } catch (error) {
-      return handleRouteError(
-        error,
-        "GET /api/resumes/[id]/assistant/conversations/[conversationId]",
-      );
-    }
-  },
-);
+    return NextResponse.json({ conversation });
+  } catch (error) {
+    return handleRouteError(
+      error,
+      "GET /api/resumes/[id]/assistant/conversations/[conversationId]",
+    );
+  }
+}
 
-export const DELETE = withRequestLog(
-  "DELETE /api/resumes/[id]/assistant/conversations/[conversationId]",
-  async (_request: Request, { params }: RouteParams) => {
-    const session = await auth();
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-    const { id, conversationId } = await params;
+  const { id, conversationId } = await params;
 
-    try {
-      await deleteConversation(id, conversationId, session.user.id);
+  try {
+    await deleteConversation(id, conversationId, session.user.id);
 
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      return handleRouteError(
-        error,
-        "DELETE /api/resumes/[id]/assistant/conversations/[conversationId]",
-      );
-    }
-  },
-);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return handleRouteError(
+      error,
+      "DELETE /api/resumes/[id]/assistant/conversations/[conversationId]",
+    );
+  }
+}

@@ -40,7 +40,6 @@ function formatMonthYear(month: number, year: number): string {
 }
 
 type Props = {
-  id?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -48,7 +47,6 @@ type Props = {
 };
 
 export function MonthYearPicker({
-  id,
   value,
   onChange,
   placeholder = "Select month",
@@ -68,7 +66,6 @@ export function MonthYearPicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          id={id}
           type="button"
           variant="outline"
           disabled={disabled}

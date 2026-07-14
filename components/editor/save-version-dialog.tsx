@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,11 +31,6 @@ export function SaveVersionDialog({ endpoint, idPrefix }: Props) {
   const [note, setNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const noteInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (open) noteInputRef.current?.focus();
-  }, [open]);
 
   const handleSave = async () => {
     setError(null);
@@ -89,11 +84,11 @@ export function SaveVersionDialog({ endpoint, idPrefix }: Props) {
         <div className="flex flex-col gap-2">
           <Label htmlFor={`${idPrefix}-version-note`}>Name</Label>
           <Input
-            ref={noteInputRef}
             id={`${idPrefix}-version-note`}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="e.g. before applying to Acme Corp"
+            autoFocus
           />
           {error && (
             <p role="alert" className="text-destructive text-sm">

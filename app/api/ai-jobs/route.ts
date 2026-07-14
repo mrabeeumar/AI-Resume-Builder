@@ -4,11 +4,10 @@ import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
 import { listActiveAiJobsForUser } from "@/services/ai-job.service";
 
-import { withRequestLog } from "@/lib/api-log";
 // Lets the client reattach to any AI jobs still running after a full page
 // reload (e.g. the tab was reopened), so it can resume polling and still
 // notify the user on completion.
-export const GET = withRequestLog("GET /api/ai-jobs", async () => {
+export async function GET() {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -22,4 +21,4 @@ export const GET = withRequestLog("GET /api/ai-jobs", async () => {
   } catch (error) {
     return handleRouteError(error, "GET /api/ai-jobs");
   }
-});
+}

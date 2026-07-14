@@ -3,6 +3,7 @@ import "@/lib/ai/prompts";
 import { getPrompt } from "@/lib/ai/prompt-manager";
 import type { ResumeSectionType } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 import { generateAIJSON } from "@/services/ai.service";
 import { getOwnedResumeOrThrow } from "@/services/resume.service";
 import {
@@ -114,7 +115,7 @@ function buildResumeSummary(sections: StoredSection[]): string {
 
 // Analyzes a resume against ATS criteria (keywords, skills, readability,
 // missing sections, job match) and returns actionable suggestions. Read-only:
-// it does not modify the resume. Results are cached in the database per
+// it does not modify the resume. Results are cached in Redis per
 // resume+job-description pair since the AI call is expensive and the
 // underlying content doesn't change on every view (see .claude/docs/ai.md).
 export async function analyzeAts(
@@ -131,11 +132,9 @@ export async function analyzeAts(
   const missingSections = getMissingSections(sections);
 
   const cacheKey = `ats-report:${resumeId}:${hashJobDescription(jobDescription)}`;
-  const cached = await prisma.atsReportCache.findUnique({
-    where: { key: cacheKey },
-  });
-  if (cached && cached.expiresAt > new Date()) {
-    return JSON.parse(cached.payload) as AtsReport;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached) as AtsReport;
   }
 
   const template = getPrompt("ATS_ANALYSIS");
@@ -154,12 +153,7 @@ export async function analyzeAts(
 
   const report: AtsReport = { ...analysis, missingSections };
 
-  const expiresAt = new Date(Date.now() + CACHE_TTL_SECONDS * 1000);
-  await prisma.atsReportCache.upsert({
-    where: { key: cacheKey },
-    create: { key: cacheKey, payload: JSON.stringify(report), expiresAt },
-    update: { payload: JSON.stringify(report), expiresAt },
-  });
+  await redis.set(cacheKey, JSON.stringify(report), "EX", CACHE_TTL_SECONDS);
 
   return report;
 }
