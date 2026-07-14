@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MailIcon } from "lucide-react";
@@ -26,11 +26,6 @@ export function CoverLetterItem({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const titleInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isEditing) titleInputRef.current?.focus();
-  }, [isEditing]);
 
   const handleRename = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,10 +94,10 @@ export function CoverLetterItem({
               className="flex flex-wrap items-center gap-2"
             >
               <Input
-                ref={titleInputRef}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-label="Cover letter title"
+                autoFocus
                 required
               />
               <Button type="submit" size="sm" disabled={isSaving}>

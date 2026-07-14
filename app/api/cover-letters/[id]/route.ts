@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
-import { withRequestLog } from "@/lib/api-log";
 import {
   deleteCoverLetter,
   getCoverLetterForUser,
@@ -11,66 +10,57 @@ import {
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export const GET = withRequestLog(
-  "GET /api/cover-letters/[id]",
-  async (_request: Request, { params }: RouteParams) => {
-    const session = await auth();
+export async function GET(_request: Request, { params }: RouteParams) {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-    const { id } = await params;
+  const { id } = await params;
 
-    try {
-      const coverLetter = await getCoverLetterForUser(id, session.user.id);
+  try {
+    const coverLetter = await getCoverLetterForUser(id, session.user.id);
 
-      return NextResponse.json({ coverLetter });
-    } catch (error) {
-      return handleRouteError(error, "GET /api/cover-letters/[id]");
-    }
-  },
-);
+    return NextResponse.json({ coverLetter });
+  } catch (error) {
+    return handleRouteError(error, "GET /api/cover-letters/[id]");
+  }
+}
 
-export const PATCH = withRequestLog(
-  "PATCH /api/cover-letters/[id]",
-  async (request: Request, { params }: RouteParams) => {
-    const session = await auth();
+export async function PATCH(request: Request, { params }: RouteParams) {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-    const { id } = await params;
+  const { id } = await params;
 
-    try {
-      const body = await request.json();
-      const coverLetter = await updateCoverLetter(id, body, session.user.id);
+  try {
+    const body = await request.json();
+    const coverLetter = await updateCoverLetter(id, body, session.user.id);
 
-      return NextResponse.json({ coverLetter });
-    } catch (error) {
-      return handleRouteError(error, "PATCH /api/cover-letters/[id]");
-    }
-  },
-);
+    return NextResponse.json({ coverLetter });
+  } catch (error) {
+    return handleRouteError(error, "PATCH /api/cover-letters/[id]");
+  }
+}
 
-export const DELETE = withRequestLog(
-  "DELETE /api/cover-letters/[id]",
-  async (_request: Request, { params }: RouteParams) => {
-    const session = await auth();
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-    const { id } = await params;
+  const { id } = await params;
 
-    try {
-      await deleteCoverLetter(id, session.user.id);
+  try {
+    await deleteCoverLetter(id, session.user.id);
 
-      return new NextResponse(null, { status: 204 });
-    } catch (error) {
-      return handleRouteError(error, "DELETE /api/cover-letters/[id]");
-    }
-  },
-);
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    return handleRouteError(error, "DELETE /api/cover-letters/[id]");
+  }
+}

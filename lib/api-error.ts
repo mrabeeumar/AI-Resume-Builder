@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { logger, serializeError } from "@/lib/logger";
-
 type StatusError = Error & { status: number };
 
 function hasStatus(error: unknown): error is StatusError {
@@ -28,7 +26,7 @@ export function handleRouteError(error: unknown, route: string): NextResponse {
     return NextResponse.json({ error: error.message }, { status: error.status });
   }
 
-  logger.error("api_error", { route, error: serializeError(error) });
+  console.error(`[api] ${route}`, error);
 
   return NextResponse.json(
     { error: "Something went wrong. Please try again." },

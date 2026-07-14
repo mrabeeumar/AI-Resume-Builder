@@ -15,7 +15,6 @@ const LOGIN_RATE_LIMIT_WINDOW_SECONDS = 15 * 60;
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  trustHost: true,
   session: {
     strategy: "jwt",
   },
