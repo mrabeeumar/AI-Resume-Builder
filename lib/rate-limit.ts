@@ -23,18 +23,32 @@ export async function enforceRateLimit(
   if (!redis) return;
 
   const redisKey = `ratelimit:${key}`;
-  const count = await redis.incr(redisKey);
+  let count: number;
 
-  if (count === 1) {
-    await redis.expire(redisKey, windowSeconds);
+  try {
+    count = await redis.incr(redisKey);
+    if (count === 1) {
+      await redis.expire(redisKey, windowSeconds);
+    }
+  } catch (error) {
+    // Redis is optional infrastructure — if it's unreachable, fail open
+    // rather than blocking the request (see lib/redis.ts).
+    console.error("Rate limit check failed, allowing request:", error);
+    return;
   }
 
   if (count > limit) {
-    const ttl = await redis.ttl(redisKey);
+    let ttl = windowSeconds;
+    try {
+      const remaining = await redis.ttl(redisKey);
+      if (remaining > 0) ttl = remaining;
+    } catch (error) {
+      console.error("Failed to read rate limit TTL:", error);
+    }
     throw new RateLimitError(
       "Too many requests. Please try again later.",
       429,
-      ttl > 0 ? ttl : windowSeconds,
+      ttl,
     );
   }
 }
