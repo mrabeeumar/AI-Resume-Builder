@@ -1,0 +1,20 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- AlterTable
+ALTER TABLE [dbo].[resumes] ADD [templateId] NVARCHAR(1000) NOT NULL CONSTRAINT [resumes_templateId_df] DEFAULT 'CLASSIC';
+ALTER TABLE [dbo].[resumes] ADD [themeColor] NVARCHAR(1000) NOT NULL CONSTRAINT [resumes_themeColor_df] DEFAULT 'SLATE';
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH
