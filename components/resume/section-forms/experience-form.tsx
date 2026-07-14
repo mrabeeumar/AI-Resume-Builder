@@ -41,43 +41,49 @@ export function ExperienceForm({ content, onChange }: Props) {
       renderFields={(item, update) => (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
-            <Label>Role</Label>
+            <Label htmlFor={`${item.id}-role`}>Role</Label>
             <Input
+              id={`${item.id}-role`}
               value={item.role}
               onChange={(e) => update({ role: e.target.value })}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label>Company</Label>
+            <Label htmlFor={`${item.id}-company`}>Company</Label>
             <Input
+              id={`${item.id}-company`}
               value={item.company}
               onChange={(e) => update({ company: e.target.value })}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label>Location</Label>
+            <Label htmlFor={`${item.id}-location`}>Location</Label>
             <Input
+              id={`${item.id}-location`}
               value={item.location}
               onChange={(e) => update({ location: e.target.value })}
             />
           </div>
           <div className="flex items-end gap-2">
             <div className="flex flex-1 flex-col gap-2">
-              <Label>Start date</Label>
+              <Label htmlFor={`${item.id}-start-date`}>Start date</Label>
               <MonthYearPicker
+                id={`${item.id}-start-date`}
                 value={item.startDate}
                 onChange={(startDate) => update({ startDate })}
               />
             </div>
             <div className="flex flex-1 flex-col gap-2">
-              <Label>End date</Label>
+              <Label htmlFor={`${item.id}-end-date`}>End date</Label>
               <MonthYearPicker
+                id={`${item.id}-end-date`}
                 value={item.endDate}
                 disabled={item.current}
                 onChange={(endDate) => update({ endDate })}
               />
             </div>
           </div>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- Checkbox is a custom Radix component; jsx-a11y can't see the native input it renders */}
           <label className="flex items-center gap-2 text-sm sm:col-span-2">
             <Checkbox
               checked={item.current}
@@ -91,8 +97,9 @@ export function ExperienceForm({ content, onChange }: Props) {
             Currently working here
           </label>
           <div className="flex flex-col gap-2 sm:col-span-2">
-            <Label>Description</Label>
+            <Label htmlFor={`${item.id}-description`}>Description</Label>
             <Textarea
+              id={`${item.id}-description`}
               rows={3}
               value={item.description}
               onChange={(e) => update({ description: e.target.value })}

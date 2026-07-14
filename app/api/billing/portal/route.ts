@@ -4,7 +4,8 @@ import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
 import { createPortalSession } from "@/services/subscription.service";
 
-export async function POST() {
+import { withRequestLog } from "@/lib/api-log";
+export const POST = withRequestLog("POST /api/billing/portal", async () => {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -18,4 +19,4 @@ export async function POST() {
   } catch (error) {
     return handleRouteError(error, "POST /api/billing/portal");
   }
-}
+});
