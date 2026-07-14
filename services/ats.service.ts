@@ -132,7 +132,7 @@ export async function analyzeAts(
   const missingSections = getMissingSections(sections);
 
   const cacheKey = `ats-report:${resumeId}:${hashJobDescription(jobDescription)}`;
-  const cached = await redis.get(cacheKey);
+  const cached = await redis?.get(cacheKey);
   if (cached) {
     return JSON.parse(cached) as AtsReport;
   }
@@ -153,7 +153,7 @@ export async function analyzeAts(
 
   const report: AtsReport = { ...analysis, missingSections };
 
-  await redis.set(cacheKey, JSON.stringify(report), "EX", CACHE_TTL_SECONDS);
+  await redis?.set(cacheKey, JSON.stringify(report), "EX", CACHE_TTL_SECONDS);
 
   return report;
 }

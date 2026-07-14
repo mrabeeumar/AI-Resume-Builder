@@ -20,6 +20,8 @@ export async function enforceRateLimit(
   limit: number,
   windowSeconds: number,
 ): Promise<void> {
+  if (!redis) return;
+
   const redisKey = `ratelimit:${key}`;
   const count = await redis.incr(redisKey);
 
