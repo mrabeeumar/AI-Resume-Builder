@@ -32,11 +32,6 @@ export default function LoginPage() {
             <Suspense fallback={null}>
               <LoginForm />
             </Suspense>
-            <div className="flex items-center gap-4">
-              <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground text-xs">OR</span>
-              <div className="bg-border h-px flex-1" />
-            </div>
             <OAuthButtons />
           </div>
         </div>
