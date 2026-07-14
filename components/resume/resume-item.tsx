@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FileTextIcon } from "lucide-react";
@@ -21,6 +21,11 @@ export function ResumeItem({ resume }: { resume: ResumeListItem }) {
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) titleInputRef.current?.focus();
+  }, [isEditing]);
 
   const handleRename = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,10 +116,10 @@ export function ResumeItem({ resume }: { resume: ResumeListItem }) {
               className="flex flex-wrap items-center gap-2"
             >
               <Input
+                ref={titleInputRef}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-label="Resume title"
-                autoFocus
                 required
               />
               <Button type="submit" size="sm" disabled={isSaving}>

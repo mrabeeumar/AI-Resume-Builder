@@ -3,6 +3,8 @@ import { after } from "next/server";
 
 import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
+import { withRequestLog } from "@/lib/api-log";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import {
   createAiJob,
   markAiJobCompleted,
@@ -16,53 +18,68 @@ import {
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function GET(_request: Request, { params }: RouteParams) {
-  const session = await auth();
+const AI_JOB_RATE_LIMIT = 15;
+const AI_JOB_RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+export const GET = withRequestLog(
+  "GET /api/resumes/[id]/review",
+  async (_request: Request, { params }: RouteParams) => {
+    const session = await auth();
 
-  const { id } = await params;
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
 
-  try {
-    const reviews = await listReviewsForResume(id, session.user.id);
+    const { id } = await params;
 
-    return NextResponse.json({ reviews });
-  } catch (error) {
-    return handleRouteError(error, "GET /api/resumes/[id]/review");
-  }
-}
+    try {
+      const reviews = await listReviewsForResume(id, session.user.id);
 
-export async function POST(request: Request, { params }: RouteParams) {
-  const session = await auth();
+      return NextResponse.json({ reviews });
+    } catch (error) {
+      return handleRouteError(error, "GET /api/resumes/[id]/review");
+    }
+  },
+);
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+export const POST = withRequestLog(
+  "POST /api/resumes/[id]/review",
+  async (request: Request, { params }: RouteParams) => {
+    const session = await auth();
 
-  const { id } = await params;
-  const userId = session.user.id;
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
 
-  try {
-    const body = await request.json().catch(() => ({}));
-    const job = await createAiJob(id, userId, "RESUME_REVIEW", body);
+    const { id } = await params;
+    const userId = session.user.id;
 
-    after(async () => {
-      try {
-        await markAiJobProcessing(job.id);
-        const review = await generateResumeReview(id, userId, body);
-        await markAiJobCompleted(job.id, review);
-      } catch (error) {
-        await markAiJobFailed(
-          job.id,
-          error instanceof Error ? error.message : "Something went wrong.",
-        );
-      }
-    });
+    try {
+      await enforceRateLimit(
+        `resumes:review:${userId}`,
+        AI_JOB_RATE_LIMIT,
+        AI_JOB_RATE_LIMIT_WINDOW_SECONDS,
+      );
 
-    return NextResponse.json({ jobId: job.id }, { status: 202 });
-  } catch (error) {
-    return handleRouteError(error, "POST /api/resumes/[id]/review");
-  }
-}
+      const body = await request.json().catch(() => ({}));
+      const job = await createAiJob(id, userId, "RESUME_REVIEW", body);
+
+      after(async () => {
+        try {
+          await markAiJobProcessing(job.id);
+          const review = await generateResumeReview(id, userId, body);
+          await markAiJobCompleted(job.id, review);
+        } catch (error) {
+          await markAiJobFailed(
+            job.id,
+            error instanceof Error ? error.message : "Something went wrong.",
+          );
+        }
+      });
+
+      return NextResponse.json({ jobId: job.id }, { status: 202 });
+    } catch (error) {
+      return handleRouteError(error, "POST /api/resumes/[id]/review");
+    }
+  },
+);

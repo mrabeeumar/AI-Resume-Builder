@@ -4,7 +4,8 @@ import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
 import { getProfileSummary } from "@/services/profile.service";
 
-export async function GET() {
+import { withRequestLog } from "@/lib/api-log";
+export const GET = withRequestLog("GET /api/profile/summary", async () => {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -18,4 +19,4 @@ export async function GET() {
   } catch (error) {
     return handleRouteError(error, "GET /api/profile/summary");
   }
-}
+});

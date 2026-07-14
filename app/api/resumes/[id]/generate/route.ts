@@ -2,25 +2,39 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
+import { withRequestLog } from "@/lib/api-log";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { generateResumeContent } from "@/services/ai-resume.service";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function POST(request: Request, { params }: RouteParams) {
-  const session = await auth();
+const AI_RATE_LIMIT = 30;
+const AI_RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+export const POST = withRequestLog(
+  "POST /api/resumes/[id]/generate",
+  async (request: Request, { params }: RouteParams) => {
+    const session = await auth();
 
-  const { id } = await params;
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
 
-  try {
-    const body = await request.json();
-    const sections = await generateResumeContent(id, session.user.id, body);
+    const { id } = await params;
 
-    return NextResponse.json({ sections });
-  } catch (error) {
-    return handleRouteError(error, "POST /api/resumes/[id]/generate");
-  }
-}
+    try {
+      await enforceRateLimit(
+        `resumes:generate:${session.user.id}`,
+        AI_RATE_LIMIT,
+        AI_RATE_LIMIT_WINDOW_SECONDS,
+      );
+
+      const body = await request.json();
+      const sections = await generateResumeContent(id, session.user.id, body);
+
+      return NextResponse.json({ sections });
+    } catch (error) {
+      return handleRouteError(error, "POST /api/resumes/[id]/generate");
+    }
+  },
+);

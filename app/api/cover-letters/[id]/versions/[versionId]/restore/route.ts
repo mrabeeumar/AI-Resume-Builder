@@ -4,29 +4,33 @@ import { auth } from "@/auth";
 import { handleRouteError } from "@/lib/api-error";
 import { restoreCoverLetterVersion } from "@/services/cover-letter-version.service";
 
+import { withRequestLog } from "@/lib/api-log";
 type RouteParams = { params: Promise<{ id: string; versionId: string }> };
 
-export async function POST(_request: Request, { params }: RouteParams) {
-  const session = await auth();
+export const POST = withRequestLog(
+  "POST /api/cover-letters/[id]/versions/[versionId]/restore",
+  async (_request: Request, { params }: RouteParams) => {
+    const session = await auth();
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
 
-  const { id, versionId } = await params;
+    const { id, versionId } = await params;
 
-  try {
-    const coverLetter = await restoreCoverLetterVersion(
-      id,
-      versionId,
-      session.user.id,
-    );
+    try {
+      const coverLetter = await restoreCoverLetterVersion(
+        id,
+        versionId,
+        session.user.id,
+      );
 
-    return NextResponse.json({ coverLetter });
-  } catch (error) {
-    return handleRouteError(
-      error,
-      "POST /api/cover-letters/[id]/versions/[versionId]/restore",
-    );
-  }
-}
+      return NextResponse.json({ coverLetter });
+    } catch (error) {
+      return handleRouteError(
+        error,
+        "POST /api/cover-letters/[id]/versions/[versionId]/restore",
+      );
+    }
+  },
+);
