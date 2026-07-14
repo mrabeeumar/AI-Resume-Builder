@@ -29,11 +29,6 @@ export default function RegisterPage() {
         <div className="bg-card rounded-2xl border p-6 shadow-lg shadow-black/[0.04]">
           <div className="flex flex-col gap-6">
             <RegisterForm />
-            <div className="flex items-center gap-4">
-              <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground text-xs">OR</span>
-              <div className="bg-border h-px flex-1" />
-            </div>
             <OAuthButtons />
           </div>
         </div>
