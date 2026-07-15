@@ -12,7 +12,7 @@ import {
 import { listVersionsForResume } from "@/services/resume-version.service";
 
 export const metadata: Metadata = {
-  title: "Version history | AI Resume Builder",
+  title: "Version history | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

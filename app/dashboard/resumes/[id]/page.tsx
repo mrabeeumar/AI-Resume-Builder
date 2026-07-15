@@ -17,7 +17,7 @@ import { listSectionsForResume } from "@/services/resume-section.service";
 import { getResumeForUser } from "@/services/resume.service";
 
 export const metadata: Metadata = {
-  title: "Edit resume | AI Resume Builder",
+  title: "Edit resume | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

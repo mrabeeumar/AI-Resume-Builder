@@ -11,7 +11,7 @@ import {
 } from "@/services/resume.service";
 
 export const metadata: Metadata = {
-  title: "Tailor resume | AI Resume Builder",
+  title: "Tailor resume | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

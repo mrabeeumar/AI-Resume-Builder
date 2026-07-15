@@ -50,7 +50,7 @@ export default function AboutPage() {
               <span className="gradient-text-static">we wished existed</span>
             </>
           }
-          subtitle="Resumely started as a side project to fix our own job search. It's now the AI resume builder trusted by hundreds of thousands of candidates."
+          subtitle="ResoVo started as a side project to fix our own job search. It's now the AI resume builder trusted by hundreds of thousands of candidates."
         />
 
         <section className="py-16">

@@ -24,7 +24,7 @@ type NavbarProps = React.ComponentProps<"header"> & {
 
 function NavbarBrand({
   href = "/",
-  name = "Resumely",
+  name = "ResoVo",
 }: {
   href?: string;
   name?: string;

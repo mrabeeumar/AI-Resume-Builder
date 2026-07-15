@@ -22,7 +22,7 @@ import {
 import { listInterviewsForApplication } from "@/services/job-interview.service";
 
 export const metadata: Metadata = {
-  title: "Job workspace | AI Resume Builder",
+  title: "Job workspace | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

@@ -12,7 +12,7 @@ import {
 } from "@/services/cover-letter.service";
 
 export const metadata: Metadata = {
-  title: "Edit cover letter | AI Resume Builder",
+  title: "Edit cover letter | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

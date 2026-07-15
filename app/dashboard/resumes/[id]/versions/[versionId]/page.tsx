@@ -18,7 +18,7 @@ import { getVersionForResume } from "@/services/resume-version.service";
 import type { ResumeSectionItem } from "@/types/resume-section";
 
 export const metadata: Metadata = {
-  title: "Resume version | AI Resume Builder",
+  title: "Resume version | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string; versionId: string }> };

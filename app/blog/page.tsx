@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 const POSTS = [
   {
     category: "Product",
-    title: "How Resumely scores your resume against real ATS parsers",
+    title: "How ResoVo scores your resume against real ATS parsers",
     date: "Jun 2026",
     readTime: "6 min read",
   },
@@ -59,7 +59,7 @@ export default function BlogPage() {
               <span className="gradient-text-static">landing the job</span>
             </>
           }
-          subtitle="Product updates and career advice from the Resumely team."
+          subtitle="Product updates and career advice from the ResoVo team."
         />
 
         <section className="py-16 pb-24">

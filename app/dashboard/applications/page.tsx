@@ -15,7 +15,7 @@ import type { JobApplicationStatus } from "@/lib/enums";
 import { listJobApplicationsForUser } from "@/services/job-application.service";
 
 export const metadata: Metadata = {
-  title: "Applications | AI Resume Builder",
+  title: "Applications | ResoVo",
 };
 
 type PageProps = {

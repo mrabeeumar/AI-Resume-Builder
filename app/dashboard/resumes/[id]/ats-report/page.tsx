@@ -9,7 +9,7 @@ import { ResumeServiceError } from "@/services/resume.service";
 import { getResumeForUser } from "@/services/resume.service";
 
 export const metadata: Metadata = {
-  title: "ATS report | AI Resume Builder",
+  title: "ATS report | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

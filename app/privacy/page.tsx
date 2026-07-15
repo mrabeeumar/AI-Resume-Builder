@@ -5,7 +5,7 @@ export default function PrivacyPage() {
     <LegalDocument
       title="Privacy Policy"
       updated="July 1, 2026"
-      intro="This policy explains what information Resumely, Inc. ('Resumely', 'we', 'us') collects, how we use it, and the choices you have."
+      intro="This policy explains what information ResoVo, Inc. ('ResoVo', 'we', 'us') collects, how we use it, and the choices you have."
       sections={[
         {
           heading: "1. Information we collect",
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
         {
           heading: "6. Contact us",
           body: [
-            "Questions about this policy can be sent to privacy@resumely.com.",
+            "Questions about this policy can be sent to privacy@resovo.com.",
           ],
         },
       ]}

@@ -42,7 +42,7 @@ function SiteFooter() {
             <span className="from-brand-1 to-brand-2 flex size-8 items-center justify-center rounded-lg bg-gradient-to-br text-white">
               R
             </span>
-            Resumely
+            ResoVo
           </span>
           <p className="text-background/50 text-sm">
             The AI resume builder that gets you hired.
@@ -68,7 +68,7 @@ function SiteFooter() {
       <div className="border-background/10 border-t">
         <Container className="flex flex-col items-center justify-between gap-3 py-6 sm:flex-row">
           <span className="text-background/50 text-sm">
-            © {new Date().getFullYear()} Resumely, Inc. All rights reserved.
+            © {new Date().getFullYear()} ResoVo, Inc. All rights reserved.
           </span>
           <div className="flex items-center gap-2 text-sm">
             <GaugeIcon className="text-background/50 size-4" />

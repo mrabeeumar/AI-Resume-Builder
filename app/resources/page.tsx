@@ -39,7 +39,7 @@ const ARTICLES = [
   {
     category: "Downloads",
     title: "Job search tracker — free Notion & Sheets template",
-    author: "Resumely Team",
+    author: "ResoVo Team",
     readTime: "Template",
   },
   {

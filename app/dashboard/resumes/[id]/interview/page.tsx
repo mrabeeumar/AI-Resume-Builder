@@ -9,7 +9,7 @@ import { listInterviewsForResume } from "@/services/interview.service";
 import { getResumeForUser, ResumeServiceError } from "@/services/resume.service";
 
 export const metadata: Metadata = {
-  title: "Interview preparation | AI Resume Builder",
+  title: "Interview preparation | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

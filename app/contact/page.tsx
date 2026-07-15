@@ -12,19 +12,19 @@ const CHANNELS = [
     icon: MailIcon,
     title: "General inquiries",
     description: "Questions, feedback, or partnership ideas.",
-    contact: "hello@resumely.com",
+    contact: "hello@resovo.com",
   },
   {
     icon: LifeBuoyIcon,
     title: "Support",
     description: "Trouble with your account, exports, or billing.",
-    contact: "support@resumely.com",
+    contact: "support@resovo.com",
   },
   {
     icon: MessageCircleIcon,
     title: "Press",
     description: "Media requests and interview inquiries.",
-    contact: "press@resumely.com",
+    contact: "press@resovo.com",
   },
 ];
 
