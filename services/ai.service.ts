@@ -61,10 +61,9 @@ export async function generateAIJSON<T>({
   );
   await assertWithinAIUsageLimit(userId);
 
-  const provider = getAIProvider();
-
   let result;
   try {
+    const provider = getAIProvider();
     result = await withRetry(() =>
       provider.complete({ system, prompt, temperature }),
     );

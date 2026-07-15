@@ -1,3 +1,4 @@
+import { AIProviderError } from "@/lib/ai/errors";
 import { GeminiProvider } from "@/lib/ai/providers/gemini.provider";
 import { GroqProvider } from "@/lib/ai/providers/groq.provider";
 import { OllamaProvider } from "@/lib/ai/providers/ollama.provider";
@@ -21,8 +22,10 @@ export function getAIProvider(): AIProvider {
   if (providerName === "groq") {
     const groqApiKey = process.env.GROQ_API_KEY;
     if (!groqApiKey) {
-      throw new Error(
+      throw new AIProviderError(
         "GROQ_API_KEY is not set. Get a free key at https://console.groq.com/keys.",
+        false,
+        500,
       );
     }
     cachedProvider = new GroqProvider(groqApiKey);
@@ -31,8 +34,10 @@ export function getAIProvider(): AIProvider {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error(
+    throw new AIProviderError(
       "GEMINI_API_KEY is not set. Get a free key at https://aistudio.google.com/apikey.",
+      false,
+      500,
     );
   }
 
