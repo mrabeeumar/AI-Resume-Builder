@@ -19,6 +19,14 @@ export const redis: Redis | null =
         })
       : null;
 
+// Without an 'error' listener, ioredis connection errors (e.g. Redis
+// unreachable) throw an uncaught exception and crash the process. Callers
+// already handle failures per-call (see lib/rate-limit.ts and
+// services/ats.service.ts), so just prevent the crash here.
+redis?.on("error", (error) => {
+  console.error("Redis client error:", error);
+});
+
 if (process.env.NODE_ENV !== "production") {
   globalForRedis.redis = redis;
 }

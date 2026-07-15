@@ -132,9 +132,9 @@ export async function analyzeAts(
   const missingSections = getMissingSections(sections);
 
   const cacheKey = `ats-report:${resumeId}:${hashJobDescription(jobDescription)}`;
-  const cached = await redis?.get(cacheKey);
+  const cached = await getCachedAtsReport(cacheKey);
   if (cached) {
-    return JSON.parse(cached) as AtsReport;
+    return cached;
   }
 
   const template = getPrompt("ATS_ANALYSIS");
@@ -153,7 +153,28 @@ export async function analyzeAts(
 
   const report: AtsReport = { ...analysis, missingSections };
 
-  await redis?.set(cacheKey, JSON.stringify(report), "EX", CACHE_TTL_SECONDS);
+  await cacheAtsReport(cacheKey, report);
 
   return report;
+}
+
+// Redis is optional infrastructure — if it's unreachable (e.g. hits
+// maxRetriesPerRequest), fail open rather than surfacing the error to the
+// user, matching the pattern in lib/rate-limit.ts.
+async function getCachedAtsReport(cacheKey: string): Promise<AtsReport | null> {
+  try {
+    const cached = await redis?.get(cacheKey);
+    return cached ? (JSON.parse(cached) as AtsReport) : null;
+  } catch (error) {
+    console.error("ATS report cache read failed, skipping cache:", error);
+    return null;
+  }
+}
+
+async function cacheAtsReport(cacheKey: string, report: AtsReport): Promise<void> {
+  try {
+    await redis?.set(cacheKey, JSON.stringify(report), "EX", CACHE_TTL_SECONDS);
+  } catch (error) {
+    console.error("ATS report cache write failed:", error);
+  }
 }
