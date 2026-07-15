@@ -22,6 +22,7 @@ export function ProfessionalTemplate({
         .filter(Boolean)
         .join(" · ")
     : null;
+  const variant = { heading: "ruled", itemLayout: "inline", skills: "tags-underline", theme } as const;
 
   return (
     <div
@@ -38,7 +39,7 @@ export function ProfessionalTemplate({
       </header>
       <div className="flex flex-col gap-5">
         {rest.map((section) => (
-          <SectionBody key={section.id} section={section} />
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>

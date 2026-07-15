@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { HeartIcon, SearchIcon } from "lucide-react";
 
@@ -14,10 +14,15 @@ import {
   type ResumeThemeColor,
 } from "@/lib/enums";
 import {
+  PAGE_SIZE_WIDTH_PX,
   TEMPLATE_DESCRIPTIONS,
   TEMPLATE_LABELS,
-  THEME_COLOR_CLASSES,
 } from "@/lib/resume-templates";
+import { RESUME_TEMPLATE_COMPONENTS } from "@/components/resume/templates";
+import {
+  SAMPLE_RESUME_SECTIONS,
+  SAMPLE_RESUME_TITLE,
+} from "@/lib/sample-resume";
 
 type GalleryEntry = {
   id: string;
@@ -42,20 +47,50 @@ const CATEGORIES: { label: string; value: ResumeTemplateId | "ALL" }[] = [
   ...RESUME_TEMPLATE_IDS.map((id) => ({ label: TEMPLATE_LABELS[id], value: id })),
 ];
 
-function TemplatePreview({ themeColor }: { themeColor: ResumeThemeColor }) {
-  const classes = THEME_COLOR_CLASSES[themeColor];
+const PAGE_WIDTH_PX = PAGE_SIZE_WIDTH_PX.A4;
+const PAGE_HEIGHT_PX = Math.round(PAGE_WIDTH_PX * (297 / 210));
+
+function TemplatePreview({
+  templateId,
+  themeColor,
+}: {
+  templateId: ResumeTemplateId;
+  themeColor: ResumeThemeColor;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
+  const Template = RESUME_TEMPLATE_COMPONENTS[templateId];
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width;
+      if (width) setScale(width / PAGE_WIDTH_PX);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="flex flex-col gap-2.5 p-5">
-      <div className="bg-foreground h-2.5 w-3/5 rounded" />
-      <div className="bg-muted-foreground/30 h-1.5 w-2/5 rounded" />
-      <div className="bg-border my-3 h-px" />
-      {[0, 1, 2].map((block) => (
-        <div key={block} className="flex flex-col gap-1.5">
-          <div className={cn("h-1.5 w-1/4 rounded", classes.swatch)} />
-          <div className="bg-muted h-1.5 w-11/12 rounded" />
-          <div className="bg-muted h-1.5 w-4/5 rounded" />
+    <div
+      ref={containerRef}
+      className="relative w-full overflow-hidden bg-white"
+      style={{ aspectRatio: `${PAGE_WIDTH_PX} / ${PAGE_HEIGHT_PX}` }}
+    >
+      {scale > 0 && (
+        <div
+          className="absolute top-0 left-0 origin-top-left"
+          style={{ width: PAGE_WIDTH_PX, transform: `scale(${scale})` }}
+        >
+          <Template
+            title={SAMPLE_RESUME_TITLE}
+            sections={SAMPLE_RESUME_SECTIONS}
+            themeColor={themeColor}
+            pageColor="WHITE"
+          />
         </div>
-      ))}
+      )}
     </div>
   );
 }
@@ -150,7 +185,10 @@ function TemplateGallery() {
             return (
               <div key={entry.id} className="group flex flex-col gap-2.5">
                 <div className="bg-card group-hover:border-primary/30 relative overflow-hidden rounded-xl border transition-all duration-300 group-hover:-translate-y-1.5 group-hover:shadow-xl">
-                  <TemplatePreview themeColor={entry.themeColor} />
+                  <TemplatePreview
+                    templateId={entry.templateId}
+                    themeColor={entry.themeColor}
+                  />
                   <button
                     type="button"
                     onClick={() => toggleFavorite(entry.id)}
