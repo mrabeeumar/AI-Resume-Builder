@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -44,6 +45,7 @@ export function CoverLetterVersionHistory({
   coverLetterId,
   initialVersions,
 }: Props) {
+  const router = useRouter();
   const [versions, setVersions] =
     useState<CoverLetterVersionListItem[]>(initialVersions);
   const [error, setError] = useState<string | null>(null);
@@ -116,8 +118,8 @@ export function CoverLetterVersionHistory({
         return;
       }
 
-      await refreshVersions();
-      setComparison(null);
+      router.push(`/dashboard/cover-letters/${coverLetterId}`);
+      router.refresh();
     } catch {
       setError(GENERIC_ERROR);
     } finally {
