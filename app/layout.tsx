@@ -27,7 +27,7 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Resume Builder",
+  title: "ResoVo",
   description: "Build ATS-optimized resumes with AI assistance.",
 };
 

@@ -72,8 +72,8 @@ export default function CareersPage() {
             <h2 className="font-heading text-2xl font-bold sm:text-3xl">Open roles</h2>
             <p className="text-muted-foreground mx-auto max-w-xl text-pretty">
               Don&apos;t see a fit? Email us at{" "}
-              <a href="mailto:careers@resumely.com" className="text-primary font-medium">
-                careers@resumely.com
+              <a href="mailto:careers@resovo.com" className="text-primary font-medium">
+                careers@resovo.com
               </a>{" "}
               — we&apos;d still love to hear from you.
             </p>
@@ -93,7 +93,7 @@ export default function CareersPage() {
                   </div>
                 </div>
                 <Link
-                  href="mailto:careers@resumely.com"
+                  href="mailto:careers@resovo.com"
                   className="text-primary inline-flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap"
                 >
                   Apply <ArrowRightIcon className="size-3.5" />

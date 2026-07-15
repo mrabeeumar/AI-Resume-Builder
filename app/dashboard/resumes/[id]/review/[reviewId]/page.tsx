@@ -9,7 +9,7 @@ import { getResumeForUser, ResumeServiceError } from "@/services/resume.service"
 import { getReviewForResume } from "@/services/resume-review.service";
 
 export const metadata: Metadata = {
-  title: "Review details | AI Resume Builder",
+  title: "Review details | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string; reviewId: string }> };

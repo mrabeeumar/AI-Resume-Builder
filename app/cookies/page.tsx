@@ -5,7 +5,7 @@ export default function CookiesPage() {
     <LegalDocument
       title="Cookie Policy"
       updated="July 1, 2026"
-      intro="This policy explains how Resumely uses cookies and similar technologies on our site."
+      intro="This policy explains how ResoVo uses cookies and similar technologies on our site."
       sections={[
         {
           heading: "1. What are cookies",
@@ -29,7 +29,7 @@ export default function CookiesPage() {
         },
         {
           heading: "4. Contact us",
-          body: ["Questions about this policy can be sent to privacy@resumely.com."],
+          body: ["Questions about this policy can be sent to privacy@resovo.com."],
         },
       ]}
     />

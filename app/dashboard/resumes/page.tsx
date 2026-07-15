@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { listResumesForUser } from "@/services/resume.service";
 
 export const metadata: Metadata = {
-  title: "Resumes | AI Resume Builder",
+  title: "Resumes | ResoVo",
 };
 
 export default async function ResumesPage() {

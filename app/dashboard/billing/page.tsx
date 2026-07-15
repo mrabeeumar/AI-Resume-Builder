@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { getSubscriptionForUser } from "@/services/subscription.service";
 
 export const metadata: Metadata = {
-  title: "Billing | AI Resume Builder",
+  title: "Billing | ResoVo",
 };
 
 export default async function BillingPage() {

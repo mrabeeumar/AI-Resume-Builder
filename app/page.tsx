@@ -58,7 +58,7 @@ const FEATURES = [
     icon: WandSparklesIcon,
     title: "Tailored to the job",
     description:
-      "Paste a job post and Resumely rewrites your resume to match what recruiters scan for.",
+      "Paste a job post and ResoVo rewrites your resume to match what recruiters scan for.",
   },
   {
     icon: DownloadIcon,
@@ -366,7 +366,7 @@ export default function Home() {
           <Container>
             <Reveal className="flex flex-col items-center gap-3 text-center">
               <span className="text-primary font-mono text-xs font-medium tracking-widest uppercase">
-                Why Resumely
+                Why ResoVo
               </span>
               <h2 className="max-w-xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
                 Everything you need to land the interview
@@ -413,7 +413,7 @@ export default function Home() {
                   </h2>
                   <p className="text-white/80">
                     75% of resumes are rejected by software before a recruiter
-                    ever sees them. Resumely scans yours against the job
+                    ever sees them. ResoVo scans yours against the job
                     description and tells you exactly what to fix.
                   </p>
                   <ul className="mt-2 flex flex-col gap-2.5">
@@ -484,7 +484,7 @@ export default function Home() {
                 Your whole job search, in one workspace
               </h2>
               <p className="text-muted-foreground max-w-xl text-pretty">
-                Resumely doesn&apos;t stop at the document — it follows you
+                ResoVo doesn&apos;t stop at the document — it follows you
                 from job post to offer letter.
               </p>
             </Reveal>

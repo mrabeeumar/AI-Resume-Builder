@@ -9,7 +9,7 @@ import { getResumeForUser, ResumeServiceError } from "@/services/resume.service"
 import { getSkillGapAnalysisForResume } from "@/services/skill-gap-analysis.service";
 
 export const metadata: Metadata = {
-  title: "Skill gap analysis details | AI Resume Builder",
+  title: "Skill gap analysis details | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string; analysisId: string }> };

@@ -348,7 +348,7 @@ export default function FeaturesPage() {
               </h2>
               <p className="text-muted-foreground">
                 Import a job posting or create an application by hand, and
-                Resumely keeps the status, resume version, and interview
+                ResoVo keeps the status, resume version, and interview
                 history together — so nothing falls through the cracks.
               </p>
               <ul className="mt-2 flex flex-col gap-2.5">

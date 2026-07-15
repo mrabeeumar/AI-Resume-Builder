@@ -24,7 +24,7 @@ import { getDashboardData } from "@/services/dashboard.service";
 import { getJobApplicationsDashboardData } from "@/services/job-application.service";
 
 export const metadata: Metadata = {
-  title: "Dashboard | AI Resume Builder",
+  title: "Dashboard | ResoVo",
 };
 
 export default async function DashboardPage() {

@@ -45,7 +45,7 @@ export async function fetchHtml(rawUrl: string): Promise<string> {
       signal: controller.signal,
       redirect: "follow",
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; ResumeAIProBot/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; ResoVoBot/1.0)",
         Accept: "text/html,application/xhtml+xml",
       },
     });

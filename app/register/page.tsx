@@ -7,7 +7,7 @@ import { Container } from "@/components/layout/container";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export const metadata: Metadata = {
-  title: "Create Account | AI Resume Builder",
+  title: "Create Account | ResoVo",
 };
 
 export default function RegisterPage() {

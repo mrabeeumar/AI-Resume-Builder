@@ -17,7 +17,7 @@ export default function SecurityPage() {
         {
           heading: "2. Infrastructure",
           body: [
-            "Resumely runs on reputable cloud infrastructure with isolated environments for production, staging, and development.",
+            "ResoVo runs on reputable cloud infrastructure with isolated environments for production, staging, and development.",
             "Access to production systems is limited to engineers who need it, and is logged and reviewed regularly.",
           ],
         },
@@ -37,7 +37,7 @@ export default function SecurityPage() {
         {
           heading: "5. Reporting a vulnerability",
           body: [
-            "If you believe you've found a security issue, please email security@resumely.com with details. We aim to acknowledge reports within 2 business days.",
+            "If you believe you've found a security issue, please email security@resovo.com with details. We aim to acknowledge reports within 2 business days.",
           ],
         },
       ]}

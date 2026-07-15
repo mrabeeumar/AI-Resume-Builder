@@ -12,7 +12,7 @@ import {
 import { listVersionsForCoverLetter } from "@/services/cover-letter-version.service";
 
 export const metadata: Metadata = {
-  title: "Cover letter version history | AI Resume Builder",
+  title: "Cover letter version history | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };

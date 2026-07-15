@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { listCoverLettersForUser } from "@/services/cover-letter.service";
 
 export const metadata: Metadata = {
-  title: "Cover letters | AI Resume Builder",
+  title: "Cover letters | ResoVo",
 };
 
 export default async function CoverLettersPage() {

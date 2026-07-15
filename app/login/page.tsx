@@ -8,7 +8,7 @@ import { Container } from "@/components/layout/container";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export const metadata: Metadata = {
-  title: "Sign In | AI Resume Builder",
+  title: "Sign In | ResoVo",
 };
 
 export default function LoginPage() {

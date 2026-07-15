@@ -9,7 +9,7 @@ import { listConversationsForResume } from "@/services/chat-history.service";
 import { getResumeForUser, ResumeServiceError } from "@/services/resume.service";
 
 export const metadata: Metadata = {
-  title: "AI Resume Assistant | AI Resume Builder",
+  title: "AI Resume Assistant | ResoVo",
 };
 
 type PageParams = { params: Promise<{ id: string }> };
