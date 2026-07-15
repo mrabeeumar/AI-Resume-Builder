@@ -22,6 +22,13 @@ export function BoldTemplate({
         .filter(Boolean)
         .join(" · ")
     : null;
+  const variant = {
+    heading: "chip",
+    itemLayout: "compact",
+    skills: "pills",
+    skillsFilled: true,
+    theme,
+  } as const;
 
   return (
     <div
@@ -44,7 +51,7 @@ export function BoldTemplate({
             key={section.id}
             className={`border-b pb-4 last:border-b-0 last:pb-0 ${theme.border}`}
           >
-            <SectionBody section={section} />
+            <SectionBody section={section} variant={variant} />
           </div>
         ))}
       </div>

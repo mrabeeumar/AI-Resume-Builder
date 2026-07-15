@@ -19,6 +19,7 @@ export function CompactTemplate({
   );
   const rest = visible.filter((section) => section.type !== "PERSONAL_INFO");
   const theme = THEME_COLOR_CLASSES[themeColor];
+  const variant = { heading: "ruled", itemLayout: "compact", skills: "inline-text", theme } as const;
 
   return (
     <div
@@ -36,7 +37,7 @@ export function CompactTemplate({
       </div>
       <div className="flex flex-col gap-3 [&_h2]:text-[11px] [&_p]:text-xs">
         {rest.map((section) => (
-          <SectionBody key={section.id} section={section} />
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>

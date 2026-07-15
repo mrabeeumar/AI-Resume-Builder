@@ -22,6 +22,7 @@ export function ExecutiveTemplate({
         .filter(Boolean)
         .join(" · ")
     : null;
+  const variant = { heading: "rail", itemLayout: "stacked", skills: "tags-underline", theme } as const;
 
   return (
     <div
@@ -40,7 +41,7 @@ export function ExecutiveTemplate({
         </header>
         <div className="flex flex-col gap-5">
           {rest.map((section) => (
-            <SectionBody key={section.id} section={section} />
+            <SectionBody key={section.id} section={section} variant={variant} />
           ))}
         </div>
       </div>

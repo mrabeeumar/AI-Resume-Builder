@@ -19,6 +19,13 @@ export function CreativeTemplate({
   );
   const rest = visible.filter((section) => section.type !== "PERSONAL_INFO");
   const theme = THEME_COLOR_CLASSES[themeColor];
+  const variant = {
+    heading: "chip",
+    itemLayout: "stacked",
+    skills: "pills",
+    skillsFilled: true,
+    theme,
+  } as const;
 
   return (
     <div
@@ -34,11 +41,9 @@ export function CreativeTemplate({
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
         )}
       </div>
-      <div
-        className={`flex flex-col gap-5 [&_h2]:opacity-100 ${theme.text} [&_li]:text-slate-900 [&_p]:text-slate-900`}
-      >
+      <div className="flex flex-col gap-5">
         {rest.map((section) => (
-          <SectionBody key={section.id} section={section} />
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>

@@ -19,6 +19,7 @@ export function TechnicalTemplate({
   );
   const rest = visible.filter((section) => section.type !== "PERSONAL_INFO");
   const theme = THEME_COLOR_CLASSES[themeColor];
+  const variant = { heading: "mono-bracket", itemLayout: "date-rail", skills: "bracket", theme } as const;
 
   return (
     <div
@@ -34,9 +35,9 @@ export function TechnicalTemplate({
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
         )}
       </div>
-      <div className="flex flex-col gap-5 [&_h2]:font-mono [&_li]:rounded [&_li]:font-sans">
+      <div className="flex flex-col gap-5">
         {rest.map((section) => (
-          <SectionBody key={section.id} section={section} />
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>

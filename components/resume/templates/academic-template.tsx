@@ -22,6 +22,7 @@ export function AcademicTemplate({
         .filter(Boolean)
         .join(" | ")
     : null;
+  const variant = { heading: "ruled", itemLayout: "date-rail", skills: "inline-text", theme } as const;
 
   return (
     <div
@@ -34,11 +35,9 @@ export function AcademicTemplate({
         )}
         {contactLine && <p className="text-sm">{contactLine}</p>}
       </header>
-      <div
-        className={`flex flex-col gap-5 [&_h2]:border-b [&_h2]:border-inherit [&_h2]:pb-1 [&_h2]:font-serif [&_h2]:text-sm [&_h2]:font-bold [&_h2]:tracking-normal [&_h2]:normal-case [&_h2]:opacity-100 ${theme.border}`}
-      >
+      <div className="flex flex-col gap-5">
         {rest.map((section) => (
-          <SectionBody key={section.id} section={section} />
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>

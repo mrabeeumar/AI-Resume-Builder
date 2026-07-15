@@ -19,6 +19,7 @@ export function TimelineTemplate({
   );
   const rest = visible.filter((section) => section.type !== "PERSONAL_INFO");
   const theme = THEME_COLOR_CLASSES[themeColor];
+  const variant = { heading: "rail", itemLayout: "date-rail", skills: "pills", theme } as const;
 
   return (
     <div
@@ -36,9 +37,7 @@ export function TimelineTemplate({
       </div>
       <div className="flex flex-col gap-5">
         {rest.map((section) => (
-          <div key={section.id} className={`border-l-2 pl-4 ${theme.border}`}>
-            <SectionBody section={section} />
-          </div>
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>

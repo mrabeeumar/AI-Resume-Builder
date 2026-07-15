@@ -22,6 +22,7 @@ export function ElegantTemplate({
         .filter(Boolean)
         .join("  ·  ")
     : null;
+  const variant = { heading: "center-serif", itemLayout: "stacked", skills: "inline-text", theme } as const;
 
   return (
     <div
@@ -39,9 +40,9 @@ export function ElegantTemplate({
         )}
         <div className={`mt-1 h-px w-24 ${theme.swatch}`} />
       </header>
-      <div className="flex flex-col gap-6 [&_h2]:text-center [&_h2]:tracking-[0.3em]">
+      <div className="flex flex-col gap-6">
         {rest.map((section) => (
-          <SectionBody key={section.id} section={section} />
+          <SectionBody key={section.id} section={section} variant={variant} />
         ))}
       </div>
     </div>
