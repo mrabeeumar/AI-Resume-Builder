@@ -29,18 +29,6 @@ async function sendEmail(to: string, subject: string, html: string) {
   }
 }
 
-export async function sendVerificationEmail(email: string, token: string) {
-  const link = `${APP_URL}/verify-email?token=${encodeURIComponent(token)}`;
-
-  await sendEmail(
-    email,
-    "Verify your email address",
-    `<p>Welcome to ResoVo! Confirm your email address to activate your account.</p>
-     <p><a href="${link}">Verify email address</a></p>
-     <p>This link expires in 24 hours. If you didn't create an account, you can ignore this email.</p>`,
-  );
-}
-
 export async function sendPasswordResetEmail(email: string, token: string) {
   const link = `${APP_URL}/reset-password?token=${encodeURIComponent(token)}`;
 
