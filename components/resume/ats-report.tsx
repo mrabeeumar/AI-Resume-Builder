@@ -1,43 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EmptyState } from "@/components/ui/empty-state";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { AtsReportContent } from "@/components/resume/ats-report-content";
 import { useAiJob, useAiJobs } from "@/components/providers/ai-jobs-provider";
-import { SECTION_TYPE_LABELS } from "@/types/resume-section";
-import type { AtsReport } from "@/types/ai";
+import type { AtsReportItem, AtsReportListItem } from "@/types/ai";
 
 type Props = {
   resumeId: string;
+  initialReports: AtsReportListItem[];
 };
 
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 
-const SCORE_ROWS: { key: keyof AtsReport; label: string }[] = [
-  { key: "overallScore", label: "Overall" },
-  { key: "keywordScore", label: "Keywords" },
-  { key: "skillsScore", label: "Skills" },
-  { key: "readabilityScore", label: "Readability" },
-  { key: "jobMatchScore", label: "Job match" },
-];
-
-function scoreColor(score: number) {
-  if (score >= 80) return "bg-success";
-  if (score >= 50) return "bg-warning";
-  return "bg-destructive";
+function formatDate(value: Date | string) {
+  return new Date(value).toLocaleString();
 }
 
-export function AtsReportView({ resumeId }: Props) {
+function scoreColor(score: number) {
+  if (score >= 80) return "text-success";
+  if (score >= 50) return "text-warning";
+  return "text-destructive";
+}
+
+export function AtsReportView({ resumeId, initialReports }: Props) {
   const { trackJob } = useAiJobs();
+  const [reports, setReports] = useState<AtsReportListItem[]>(initialReports);
   const [jobDescription, setJobDescription] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const refreshedJobIdRef = useRef<string | null>(null);
 
   const activeJob = useAiJob(activeJobId);
 
@@ -46,12 +46,33 @@ export function AtsReportView({ resumeId }: Props) {
     (activeJob !== null &&
       activeJob.status !== "COMPLETED" &&
       activeJob.status !== "FAILED");
-  const report =
-    activeJob?.status === "COMPLETED" ? (activeJob.result as AtsReport) : null;
+  const latest =
+    activeJob?.status === "COMPLETED"
+      ? (activeJob.result as AtsReportItem)
+      : null;
   const error =
     activeJob?.status === "FAILED"
       ? (activeJob.error ?? GENERIC_ERROR)
       : submitError;
+
+  const refreshReports = async () => {
+    const response = await fetch(`/api/resumes/${resumeId}/ats-analysis`);
+    const data = await response.json().catch(() => null);
+    if (response.ok) {
+      setReports(data.reports as AtsReportListItem[]);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      activeJob?.status === "COMPLETED" &&
+      refreshedJobIdRef.current !== activeJob.id
+    ) {
+      refreshedJobIdRef.current = activeJob.id;
+      void refreshReports();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeJob]);
 
   const handleAnalyze = async () => {
     setSubmitError(null);
@@ -78,6 +99,33 @@ export function AtsReportView({ resumeId }: Props) {
       setSubmitError(GENERIC_ERROR);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (reportId: string) => {
+    setSubmitError(null);
+    setDeletingId(reportId);
+
+    try {
+      const response = await fetch(
+        `/api/resumes/${resumeId}/ats-analysis/${reportId}`,
+        { method: "DELETE" },
+      );
+
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        setSubmitError(data?.error ?? GENERIC_ERROR);
+        return;
+      }
+
+      if (latest?.id === reportId) {
+        setActiveJobId(null);
+      }
+      await refreshReports();
+    } catch {
+      setSubmitError(GENERIC_ERROR);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -118,82 +166,62 @@ export function AtsReportView({ resumeId }: Props) {
         )}
       </div>
 
-      {!report && !isAnalyzing && !error && (
-        <EmptyState
-          title="No ATS report yet"
-          description="Run an analysis to see how this resume scores against applicant tracking systems."
-        />
-      )}
+      {latest && <AtsReportContent report={latest.content} />}
 
-      {report && (
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            {SCORE_ROWS.filter(
-              (row) =>
-                row.key !== "jobMatchScore" || report.jobMatchScore !== null,
-            ).map((row) => {
-              const score = (report[row.key] as number | null) ?? 0;
-              return (
-                <div key={row.key} className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-foreground font-medium">
-                      {row.label}
-                    </span>
-                    <span className="text-muted-foreground">{score}/100</span>
+      <div className="flex flex-col gap-3">
+        <h2 className="text-foreground font-semibold">Report history</h2>
+        {reports.length === 0 ? (
+          <p className="text-muted-foreground text-sm">
+            No ATS reports yet. Run an analysis above to see how this resume
+            scores against applicant tracking systems.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {reports.map((report) => (
+              <li key={report.id}>
+                <Card className="flex-row flex-wrap items-center justify-between gap-3 p-4">
+                  <div>
+                    <p className="text-foreground font-medium">
+                      Overall score:{" "}
+                      <span className={scoreColor(report.overallScore)}>
+                        {report.overallScore}/100
+                      </span>
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {formatDate(report.createdAt)}
+                    </p>
                   </div>
-                  <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
-                    <div
-                      className={`h-full rounded-full ${scoreColor(score)}`}
-                      style={{ width: `${score}%` }}
+                  <div className="flex items-center gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link
+                        href={`/dashboard/resumes/${resumeId}/ats-report/${report.id}`}
+                      >
+                        View details
+                      </Link>
+                    </Button>
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={deletingId === report.id}
+                        >
+                          {deletingId === report.id ? "Deleting..." : "Delete"}
+                        </Button>
+                      }
+                      title="Delete this report?"
+                      description="This cannot be undone."
+                      confirmLabel="Delete"
+                      onConfirm={() => handleDelete(report.id)}
                     />
                   </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {report.missingSections.length > 0 && (
-            <Card className="gap-2 p-4">
-              <h2 className="text-foreground font-semibold">
-                Missing sections
-              </h2>
-              <ul className="flex flex-wrap gap-2">
-                {report.missingSections.map((type) => (
-                  <li key={type}>
-                    <Badge variant="warning">{SECTION_TYPE_LABELS[type]}</Badge>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
-
-          {report.missingKeywords.length > 0 && (
-            <Card className="gap-2 p-4">
-              <h2 className="text-foreground font-semibold">
-                Missing keywords
-              </h2>
-              <ul className="flex flex-wrap gap-2">
-                {report.missingKeywords.map((keyword) => (
-                  <li key={keyword}>
-                    <Badge variant="warning">{keyword}</Badge>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
-
-          {report.suggestions.length > 0 && (
-            <Card className="gap-2 p-4">
-              <h2 className="text-foreground font-semibold">Suggestions</h2>
-              <ul className="text-muted-foreground flex list-disc flex-col gap-1 pl-5 text-sm">
-                {report.suggestions.map((suggestion) => (
-                  <li key={suggestion}>{suggestion}</li>
-                ))}
-              </ul>
-            </Card>
-          )}
-        </div>
-      )}
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

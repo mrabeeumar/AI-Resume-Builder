@@ -1,25 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { registerSchema } from "@/types/auth";
+import { resetPasswordSchema } from "@/types/auth";
 
-export function RegisterForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+export function ResetPasswordForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registered, setRegistered] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const parsed = registerSchema.safeParse({ name, email, password });
+    const parsed = resetPasswordSchema.safeParse({ token, password });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Invalid input.");
       return;
@@ -27,7 +30,7 @@ export function RegisterForm() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
@@ -39,7 +42,8 @@ export function RegisterForm() {
         return;
       }
 
-      setRegistered(true);
+      setSuccess(true);
+      setTimeout(() => router.push("/login"), 2000);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -47,11 +51,18 @@ export function RegisterForm() {
     }
   };
 
-  if (registered) {
+  if (!token) {
+    return (
+      <p role="alert" className="text-destructive text-sm">
+        This password reset link is invalid. Please request a new one.
+      </p>
+    );
+  }
+
+  if (success) {
     return (
       <p className="text-muted-foreground text-sm">
-        We&apos;ve sent a verification link to {email}. Please check your
-        inbox to activate your account before signing in.
+        Your password has been reset. Redirecting you to sign in...
       </p>
     );
   }
@@ -59,31 +70,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          type="text"
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          aria-invalid={Boolean(error)}
-          required
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          aria-invalid={Boolean(error)}
-          required
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">New password</Label>
         <Input
           id="password"
           type="password"
@@ -100,7 +87,7 @@ export function RegisterForm() {
         </p>
       )}
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating account..." : "Create account"}
+        {isSubmitting ? "Resetting..." : "Reset password"}
       </Button>
     </form>
   );

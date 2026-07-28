@@ -1,5 +1,6 @@
 import type { ResumeSectionType } from "@/lib/enums";
 import { CertificationsForm } from "@/components/resume/section-forms/certifications-form";
+import { CustomSectionForm } from "@/components/resume/section-forms/custom-section-form";
 import { EducationForm } from "@/components/resume/section-forms/education-form";
 import { ExperienceForm } from "@/components/resume/section-forms/experience-form";
 import { PersonalInfoForm } from "@/components/resume/section-forms/personal-info-form";
@@ -8,6 +9,7 @@ import { SkillsForm } from "@/components/resume/section-forms/skills-form";
 import { SummaryForm } from "@/components/resume/section-forms/summary-form";
 import type {
   CertificationsContent,
+  CustomContent,
   EducationContent,
   ExperienceContent,
   PersonalInfoContent,
@@ -64,6 +66,13 @@ export function SectionForm({ type, content, onChange }: Props) {
       return (
         <CertificationsForm
           content={content as CertificationsContent}
+          onChange={onChange}
+        />
+      );
+    case "CUSTOM":
+      return (
+        <CustomSectionForm
+          content={content as CustomContent}
           onChange={onChange}
         />
       );

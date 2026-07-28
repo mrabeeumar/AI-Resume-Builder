@@ -324,7 +324,11 @@ export function ResumeEditorProvider({
   );
 
   const availableTypes = useMemo(() => {
-    const usedTypes = new Set(sections.map((section) => section.type));
+    const usedTypes = new Set(
+      sections
+        .filter((section) => section.type !== "CUSTOM")
+        .map((section) => section.type),
+    );
     return EDITABLE_SECTION_TYPES.filter((type) => !usedTypes.has(type));
   }, [sections]);
 

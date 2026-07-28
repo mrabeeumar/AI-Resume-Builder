@@ -5,21 +5,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { registerSchema } from "@/types/auth";
+import { forgotPasswordSchema } from "@/types/auth";
 
-export function RegisterForm() {
-  const [name, setName] = useState("");
+export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registered, setRegistered] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const parsed = registerSchema.safeParse({ name, email, password });
+    const parsed = forgotPasswordSchema.safeParse({ email });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Invalid input.");
       return;
@@ -27,19 +25,15 @@ export function RegisterForm() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/auth/register", {
+      await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        setError(data?.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-
-      setRegistered(true);
+      // Always show the same confirmation, regardless of whether the
+      // account exists, so this form can't be used to enumerate emails.
+      setSubmitted(true);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -47,29 +41,17 @@ export function RegisterForm() {
     }
   };
 
-  if (registered) {
+  if (submitted) {
     return (
       <p className="text-muted-foreground text-sm">
-        We&apos;ve sent a verification link to {email}. Please check your
-        inbox to activate your account before signing in.
+        If an account exists for {email}, we&apos;ve sent a link to reset
+        your password.
       </p>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          type="text"
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          aria-invalid={Boolean(error)}
-          required
-        />
-      </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -82,25 +64,13 @@ export function RegisterForm() {
           required
         />
       </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete="new-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          aria-invalid={Boolean(error)}
-          required
-        />
-      </div>
       {error && (
         <p role="alert" className="text-destructive text-sm">
           {error}
         </p>
       )}
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating account..." : "Create account"}
+        {isSubmitting ? "Sending..." : "Send reset link"}
       </Button>
     </form>
   );

@@ -70,7 +70,17 @@ export class OllamaProvider implements AIProvider {
       );
     }
 
-    const data = (await response.json()) as OllamaChatResponse;
+    let data: OllamaChatResponse;
+    try {
+      data = (await response.json()) as OllamaChatResponse;
+    } catch {
+      throw new AIProviderError(
+        "Ollama returned a malformed response.",
+        true,
+        502,
+      );
+    }
+
     const text = data.message?.content;
 
     if (!text) {

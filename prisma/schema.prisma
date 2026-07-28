@@ -123,6 +123,7 @@ model Resume {
   sections          ResumeSection[]
   versions          ResumeVersion[]
   reviews           ResumeReview[]
+  atsReports        AtsReport[]
   coverLetters      CoverLetter[]
   skillGapAnalyses  SkillGapAnalysis[]
   aiJobs            AiJob[]
@@ -179,6 +180,24 @@ model ResumeReview {
 
   @@index([resumeId])
   @@map("resume_reviews")
+}
+
+// Persists the result of an ATS analysis so it can be revisited later,
+// matching the pattern used by ResumeReview and SkillGapAnalysis. Previously
+// ATS reports were only cached in Redis (optional, TTL-bound infra) and held
+// in the transient AiJob row, so they became unrecoverable once the job left
+// the "active" list — this table is now the durable source of truth.
+model AtsReport {
+  id           String   @id @default(uuid())
+  resumeId     String
+  overallScore Int
+  content      String   @db.NVarChar(Max)
+  createdAt    DateTime @default(now())
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId])
+  @@map("ats_reports")
 }
 
 model SkillGapAnalysis {

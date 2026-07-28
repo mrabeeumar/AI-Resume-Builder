@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -9,10 +9,16 @@ import { prisma } from "@/lib/prisma";
 import { getClientIp } from "@/lib/request-ip";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { loginSchema } from "@/types/auth";
-import { verifyCredentials } from "@/services/auth.service";
+import { EmailNotVerifiedError, verifyCredentials } from "@/services/auth.service";
 
 const LOGIN_RATE_LIMIT = 10;
 const LOGIN_RATE_LIMIT_WINDOW_SECONDS = 15 * 60;
+
+// Surfaced to the client via signIn()'s `code` result so the login form can
+// show a "resend verification email" action instead of a generic error.
+class EmailNotVerifiedSignin extends CredentialsSignin {
+  code = "email-not-verified";
+}
 
 // Google/LinkedIn are only wired in once their OAuth credentials are
 // configured — omitting them entirely avoids broken sign-in buttons when the
@@ -66,12 +72,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const user = await verifyCredentials(
-          parsed.data.email,
-          parsed.data.password,
-        );
+        try {
+          const user = await verifyCredentials(
+            parsed.data.email,
+            parsed.data.password,
+          );
 
-        return user;
+          return user;
+        } catch (error) {
+          if (error instanceof EmailNotVerifiedError) {
+            throw new EmailNotVerifiedSignin();
+          }
+          throw error;
+        }
       },
     }),
   ],

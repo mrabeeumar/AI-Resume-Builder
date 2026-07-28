@@ -4,31 +4,30 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { BackButton } from "@/components/layout/back-button";
 import { Container } from "@/components/layout/container";
-import { AtsReportView } from "@/components/resume/ats-report";
-import { ResumeServiceError } from "@/services/resume.service";
-import { getResumeForUser } from "@/services/resume.service";
-import { listAtsReportsForResume } from "@/services/ats.service";
+import { AtsReportContent } from "@/components/resume/ats-report-content";
+import { getResumeForUser, ResumeServiceError } from "@/services/resume.service";
+import { getAtsReportForResume } from "@/services/ats.service";
 
 export const metadata: Metadata = {
-  title: "ATS report | ResoVo",
+  title: "ATS report details | ResoVo",
 };
 
-type PageParams = { params: Promise<{ id: string }> };
+type PageParams = { params: Promise<{ id: string; reportId: string }> };
 
-export default async function AtsReportPage({ params }: PageParams) {
+export default async function AtsReportDetailsPage({ params }: PageParams) {
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const { id } = await params;
+  const { id, reportId } = await params;
 
   let resume;
-  let reports;
+  let report;
   try {
     resume = await getResumeForUser(id, session.user.id);
-    reports = await listAtsReportsForResume(id, session.user.id);
+    report = await getAtsReportForResume(id, reportId, session.user.id);
   } catch (error) {
     if (error instanceof ResumeServiceError && error.status === 404) {
       notFound();
@@ -45,18 +44,18 @@ export default async function AtsReportPage({ params }: PageParams) {
       <Container className="flex flex-col gap-8">
         <div className="flex flex-col gap-2">
           <BackButton
-            href={`/dashboard/resumes/${id}`}
-            label="Back to editor"
+            href={`/dashboard/resumes/${id}/ats-report`}
+            label="Back to report history"
           />
           <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-            ATS report
+            ATS report details
           </h1>
           <p className="text-muted-foreground">
-            {resume.title} — check keyword coverage, skills, readability, and
-            missing sections, and get actionable suggestions.
+            {resume.title} — analyzed on{" "}
+            {new Date(report.createdAt).toLocaleString()}.
           </p>
         </div>
-        <AtsReportView resumeId={id} initialReports={reports} />
+        <AtsReportContent report={report.content} />
       </Container>
     </main>
   );

@@ -97,6 +97,17 @@ export type AtsReport = AtsAnalysisResult & {
   missingSections: ResumeSectionType[];
 };
 
+export type AtsReportListItem = {
+  id: string;
+  resumeId: string;
+  overallScore: number;
+  createdAt: Date;
+};
+
+export type AtsReportItem = AtsReportListItem & {
+  content: AtsReport;
+};
+
 // Shared output shape for cover letter generation, rewriting, and
 // customization — all three return a single plain-text letter body.
 export const generatedCoverLetterSchema = z.object({

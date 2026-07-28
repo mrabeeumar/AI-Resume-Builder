@@ -78,7 +78,17 @@ export class GeminiProvider implements AIProvider {
       );
     }
 
-    const data = (await response.json()) as GeminiResponse;
+    let data: GeminiResponse;
+    try {
+      data = (await response.json()) as GeminiResponse;
+    } catch {
+      throw new AIProviderError(
+        "Gemini API returned a malformed response.",
+        true,
+        502,
+      );
+    }
+
     const candidate = data.candidates?.[0];
     const text = candidate?.content?.parts?.[0]?.text;
 

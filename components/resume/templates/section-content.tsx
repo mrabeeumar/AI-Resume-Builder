@@ -1,9 +1,10 @@
 import {
-  SECTION_TYPE_LABELS,
+  getSectionHeading,
   type ResumeSectionItem,
 } from "@/types/resume-section";
 import type {
   CertificationsContent,
+  CustomContent,
   EducationContent,
   ExperienceContent,
   PersonalInfoContent,
@@ -76,7 +77,7 @@ export function SectionBody({
   section: ResumeSectionItem;
   variant?: SectionVariant;
 }) {
-  const heading = SECTION_TYPE_LABELS[section.type];
+  const heading = getSectionHeading(section);
   const itemLayout = variant?.itemLayout ?? "inline";
   const theme = variant?.theme;
 
@@ -191,6 +192,28 @@ export function SectionBody({
                 meta={null}
                 date={item.date}
                 description={null}
+              />
+            ))}
+          </div>
+        </SectionShell>
+      );
+    }
+
+    case "CUSTOM": {
+      const content = section.content as CustomContent;
+      if (content.items.length === 0) return null;
+      return (
+        <SectionShell heading={heading} variant={variant}>
+          <div className="flex flex-col gap-3">
+            {content.items.map((item) => (
+              <ItemRow
+                key={item.id}
+                layout={itemLayout}
+                theme={theme}
+                title={item.title}
+                meta={item.subtitle}
+                date={item.date}
+                description={item.description}
               />
             ))}
           </div>
