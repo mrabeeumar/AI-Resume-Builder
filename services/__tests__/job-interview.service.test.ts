@@ -27,6 +27,7 @@ vi.mock("@/lib/prisma", () => ({
       create: (...args: unknown[]) => applicationTimelineCreateMock(...args),
     },
   },
+  createWithSequenceRetry: async <T>(attempt: () => Promise<T>) => attempt(),
 }));
 
 const {

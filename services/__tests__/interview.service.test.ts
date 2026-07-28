@@ -41,6 +41,7 @@ const interviewSessionFindManyMock = vi.fn();
 const interviewSessionUpdateMock = vi.fn();
 const interviewQuestionCreateMock = vi.fn();
 const interviewQuestionFindManyMock = vi.fn();
+const interviewQuestionFindFirstMock = vi.fn();
 const interviewQuestionUpdateMock = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -54,9 +55,11 @@ vi.mock("@/lib/prisma", () => ({
     interviewQuestion: {
       create: (...args: unknown[]) => interviewQuestionCreateMock(...args),
       findMany: (...args: unknown[]) => interviewQuestionFindManyMock(...args),
+      findFirst: (...args: unknown[]) => interviewQuestionFindFirstMock(...args),
       update: (...args: unknown[]) => interviewQuestionUpdateMock(...args),
     },
   },
+  createWithSequenceRetry: async <T>(attempt: () => Promise<T>) => attempt(),
 }));
 
 const {
@@ -249,12 +252,14 @@ describe("submitInterviewAnswer", () => {
     resumeSectionFindManyMock.mockReset();
     interviewSessionFindUniqueMock.mockReset();
     interviewQuestionFindManyMock.mockReset();
+    interviewQuestionFindFirstMock.mockReset();
     interviewQuestionUpdateMock.mockReset();
     interviewQuestionCreateMock.mockReset();
 
     getOwnedResumeOrThrowMock.mockResolvedValue({ id: "resume-1", userId: "user-1" });
     resumeSectionFindManyMock.mockResolvedValue(dbSections());
     interviewSessionFindUniqueMock.mockResolvedValue(dbSession());
+    interviewQuestionFindFirstMock.mockResolvedValue(dbQuestion());
     interviewQuestionUpdateMock.mockImplementation(({ where, data }) =>
       Promise.resolve(dbQuestion({ id: where.id, ...data })),
     );
