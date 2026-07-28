@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { ResumeSectionType } from "@/lib/enums";
 import { cn } from "@/lib/utils";
-import { SECTION_TYPE_LABELS } from "@/types/resume-section";
+import { getSectionHeading, SECTION_TYPE_LABELS } from "@/types/resume-section";
 
 const SECTION_ICONS: Record<ResumeSectionType, LucideIcon> = {
   PERSONAL_INFO: UserRound,
@@ -94,7 +94,7 @@ export function SectionNav() {
                     <Icon className="size-3.5" />
                   </span>
                   <span className="truncate">
-                    {SECTION_TYPE_LABELS[section.type]}
+                    {getSectionHeading(section)}
                   </span>
                   {section.hidden && (
                     <EyeOff className="text-muted-foreground size-3.5 shrink-0" />
@@ -112,7 +112,7 @@ export function SectionNav() {
                     size="icon"
                     className="size-6"
                     disabled={index === 0}
-                    aria-label={`Move ${SECTION_TYPE_LABELS[section.type]} up`}
+                    aria-label={`Move ${getSectionHeading(section)} up`}
                     onClick={() => moveSection(section.id, "up")}
                   >
                     <ChevronUp className="size-3.5" />
@@ -123,7 +123,7 @@ export function SectionNav() {
                     size="icon"
                     className="size-6"
                     disabled={index === sections.length - 1}
-                    aria-label={`Move ${SECTION_TYPE_LABELS[section.type]} down`}
+                    aria-label={`Move ${getSectionHeading(section)} down`}
                     onClick={() => moveSection(section.id, "down")}
                   >
                     <ChevronDown className="size-3.5" />

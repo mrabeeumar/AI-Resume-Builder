@@ -92,6 +92,18 @@ export const certificationsContentSchema = z.object({
   items: z.array(certificationItemSchema).max(50).optional().default([]),
 });
 
+export const customItemSchema = z.object({
+  id: itemId(),
+  title: optionalText(120),
+  subtitle: optionalText(120),
+  date: optionalText(20),
+  description: optionalText(2000),
+});
+export const customContentSchema = z.object({
+  heading: optionalText(80),
+  items: z.array(customItemSchema).max(50).optional().default([]),
+});
+
 const genericContentSchema = z.record(z.string(), z.unknown());
 
 export const sectionContentSchemas: Record<ResumeSectionType, z.ZodTypeAny> = {
@@ -104,7 +116,7 @@ export const sectionContentSchemas: Record<ResumeSectionType, z.ZodTypeAny> = {
   CERTIFICATIONS: certificationsContentSchema,
   LANGUAGES: genericContentSchema,
   AWARDS: genericContentSchema,
-  CUSTOM: genericContentSchema,
+  CUSTOM: customContentSchema,
 };
 
 export function parseSectionContent(type: ResumeSectionType, content: unknown) {
@@ -119,6 +131,7 @@ export const EDITABLE_SECTION_TYPES = [
   "SKILLS",
   "PROJECTS",
   "CERTIFICATIONS",
+  "CUSTOM",
 ] as const satisfies readonly ResumeSectionType[];
 
 export const SECTION_TYPE_LABELS: Record<ResumeSectionType, string> = {
@@ -150,7 +163,7 @@ export const DEFAULT_SECTION_CONTENT: Record<ResumeSectionType, unknown> = {
   CERTIFICATIONS: { items: [] },
   LANGUAGES: {},
   AWARDS: {},
-  CUSTOM: {},
+  CUSTOM: { heading: "", items: [] },
 };
 
 export const createSectionSchema = z.object({
@@ -182,6 +195,7 @@ export type EducationContent = z.infer<typeof educationContentSchema>;
 export type SkillsContent = z.infer<typeof skillsContentSchema>;
 export type ProjectsContent = z.infer<typeof projectsContentSchema>;
 export type CertificationsContent = z.infer<typeof certificationsContentSchema>;
+export type CustomContent = z.infer<typeof customContentSchema>;
 
 export type ResumeSectionItem = {
   id: string;
@@ -193,3 +207,14 @@ export type ResumeSectionItem = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export function getSectionHeading(section: {
+  type: ResumeSectionType;
+  content: unknown;
+}): string {
+  if (section.type === "CUSTOM") {
+    const heading = (section.content as CustomContent).heading?.trim();
+    return heading || "Custom Section";
+  }
+  return SECTION_TYPE_LABELS[section.type];
+}

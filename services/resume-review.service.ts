@@ -18,6 +18,7 @@ import { resumeReviewAIOutputSchema } from "@/types/resume-review.schema";
 import {
   parseSectionContent,
   type CertificationsContent,
+  type CustomContent,
   type EducationContent,
   type ExperienceContent,
   type ProjectsContent,
@@ -104,6 +105,13 @@ function buildReviewSummary(sections: ResumeSnapshotSection[]): string {
       const certifications = content as CertificationsContent;
       for (const item of certifications.items) {
         parts.push(`Certification: ${item.name} — ${item.issuer}`);
+      }
+    } else if (section.type === "CUSTOM") {
+      const custom = content as CustomContent;
+      for (const item of custom.items) {
+        parts.push(
+          `${custom.heading || "Additional"}: ${item.title} — ${item.description}`,
+        );
       }
     }
   }

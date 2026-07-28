@@ -70,7 +70,17 @@ export class GroqProvider implements AIProvider {
       );
     }
 
-    const data = (await response.json()) as GroqResponse;
+    let data: GroqResponse;
+    try {
+      data = (await response.json()) as GroqResponse;
+    } catch {
+      throw new AIProviderError(
+        "Groq API returned a malformed response.",
+        true,
+        502,
+      );
+    }
+
     const choice = data.choices?.[0];
     const text = choice?.message?.content;
 

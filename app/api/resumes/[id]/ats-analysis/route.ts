@@ -9,9 +9,30 @@ import {
   markAiJobFailed,
   markAiJobProcessing,
 } from "@/services/ai-job.service";
-import { analyzeAts } from "@/services/ats.service";
+import {
+  generateAndSaveAtsReport,
+  listAtsReportsForResume,
+} from "@/services/ats.service";
 
 type RouteParams = { params: Promise<{ id: string }> };
+
+export async function GET(_request: Request, { params }: RouteParams) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    const reports = await listAtsReportsForResume(id, session.user.id);
+
+    return NextResponse.json({ reports });
+  } catch (error) {
+    return handleRouteError(error, "GET /api/resumes/[id]/ats-analysis");
+  }
+}
 
 export async function POST(request: Request, { params }: RouteParams) {
   const session = await auth();
@@ -30,7 +51,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     after(async () => {
       try {
         await markAiJobProcessing(job.id);
-        const result = await analyzeAts(id, userId, body);
+        const result = await generateAndSaveAtsReport(id, userId, body);
         await markAiJobCompleted(job.id, result);
       } catch (error) {
         await markAiJobFailed(

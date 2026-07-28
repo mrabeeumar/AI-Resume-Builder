@@ -5,15 +5,18 @@ import type { ResumeSectionType } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { generateAIJSON } from "@/services/ai.service";
-import { getOwnedResumeOrThrow } from "@/services/resume.service";
+import { getOwnedResumeOrThrow, ResumeServiceError } from "@/services/resume.service";
 import {
   atsAnalysisResultSchema,
   atsAnalyzeSchema,
   type AtsAnalyzeInput,
   type AtsReport,
+  type AtsReportItem,
+  type AtsReportListItem,
 } from "@/types/ai";
 import {
   parseSectionContent,
+  type CustomContent,
   type EducationContent,
   type ExperienceContent,
   type ProjectsContent,
@@ -107,6 +110,13 @@ function buildResumeSummary(sections: StoredSection[]): string {
       for (const item of projects.items) {
         parts.push(`Project: ${item.name} — ${item.description}`);
       }
+    } else if (type === "CUSTOM") {
+      const custom = content as CustomContent;
+      for (const item of custom.items) {
+        parts.push(
+          `${custom.heading || "Additional"}: ${item.title} — ${item.description}`,
+        );
+      }
     }
   }
 
@@ -177,4 +187,91 @@ async function cacheAtsReport(cacheKey: string, report: AtsReport): Promise<void
   } catch (error) {
     console.error("ATS report cache write failed:", error);
   }
+}
+
+function serializeAtsReport(report: {
+  id: string;
+  resumeId: string;
+  overallScore: number;
+  content: string;
+  createdAt: Date;
+}): AtsReportItem {
+  return {
+    id: report.id,
+    resumeId: report.resumeId,
+    overallScore: report.overallScore,
+    createdAt: report.createdAt,
+    content: JSON.parse(report.content) as AtsReport,
+  };
+}
+
+// Runs the ATS analysis and persists the result so it can be revisited later
+// (see the AtsReport Prisma model) rather than only existing in the Redis
+// cache and the transient AiJob row, which are not permanent storage.
+export async function generateAndSaveAtsReport(
+  resumeId: string,
+  userId: string,
+  input: AtsAnalyzeInput,
+): Promise<AtsReportItem> {
+  const report = await analyzeAts(resumeId, userId, input);
+
+  const created = await prisma.atsReport.create({
+    data: {
+      resumeId,
+      overallScore: report.overallScore,
+      content: JSON.stringify(report),
+    },
+  });
+
+  return serializeAtsReport(created);
+}
+
+export async function listAtsReportsForResume(
+  resumeId: string,
+  userId: string,
+): Promise<AtsReportListItem[]> {
+  await getOwnedResumeOrThrow(resumeId, userId);
+
+  return prisma.atsReport.findMany({
+    where: { resumeId },
+    select: {
+      id: true,
+      resumeId: true,
+      overallScore: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getAtsReportForResume(
+  resumeId: string,
+  reportId: string,
+  userId: string,
+): Promise<AtsReportItem> {
+  await getOwnedResumeOrThrow(resumeId, userId);
+
+  const report = await prisma.atsReport.findUnique({ where: { id: reportId } });
+
+  if (!report || report.resumeId !== resumeId) {
+    throw new ResumeServiceError("ATS report not found.", 404);
+  }
+
+  return serializeAtsReport(report);
+}
+
+export async function deleteAtsReportForResume(
+  resumeId: string,
+  reportId: string,
+  userId: string,
+): Promise<void> {
+  await getOwnedResumeOrThrow(resumeId, userId);
+
+  const report = await prisma.atsReport.findUnique({ where: { id: reportId } });
+
+  if (!report || report.resumeId !== resumeId) {
+    throw new ResumeServiceError("ATS report not found.", 404);
+  }
+
+  await prisma.atsReport.delete({ where: { id: reportId } });
 }

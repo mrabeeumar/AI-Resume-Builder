@@ -29,6 +29,7 @@ import type { ParsedJobDescription } from "@/types/job-parser.schema";
 import {
   parseSectionContent,
   type CertificationsContent,
+  type CustomContent,
   type ExperienceContent,
   type ProjectsContent,
   type SkillsContent,
@@ -138,6 +139,16 @@ function buildResumeContext(sections: ResumeSnapshotSection[]): string {
   );
   for (const item of certifications.items) {
     parts.push(`Certification [id=${item.id}]: ${item.name} — ${item.issuer}`);
+  }
+
+  const customSections = sections.filter((s) => s.type === "CUSTOM");
+  for (const section of customSections) {
+    const custom = parseSectionContent("CUSTOM", section.content) as CustomContent;
+    for (const item of custom.items) {
+      parts.push(
+        `${custom.heading || "Additional"} [id=${item.id}]: ${item.title} — ${item.description}`,
+      );
+    }
   }
 
   return parts.join("\n") || "The resume has no content yet.";

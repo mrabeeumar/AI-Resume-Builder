@@ -30,6 +30,7 @@ import { listSectionsForResume } from "@/services/resume-section.service";
 import { getOwnedResumeOrThrow } from "@/services/resume.service";
 import type {
   CertificationsContent,
+  CustomContent,
   EducationContent,
   ExperienceContent,
   PersonalInfoContent,
@@ -38,7 +39,7 @@ import type {
   SkillsContent,
   SummaryContent,
 } from "@/types/resume-section";
-import { SECTION_TYPE_LABELS } from "@/types/resume-section";
+import { getSectionHeading } from "@/types/resume-section";
 
 type ExportItem = { primary?: string; secondary?: string; body?: string };
 type ExportBlock = {
@@ -241,7 +242,7 @@ function buildExportModel(resume: {
 
   for (const section of resume.sections) {
     if (section.hidden || section.type === "PERSONAL_INFO") continue;
-    const heading = SECTION_TYPE_LABELS[section.type];
+    const heading = getSectionHeading(section);
 
     if (section.type === "SUMMARY") {
       const content = section.content as SummaryContent;
@@ -296,6 +297,17 @@ function buildExportModel(resume: {
       const items = content.items.map((item) => ({
         primary: joined([item.name, item.issuer], " · "),
         secondary: item.date || undefined,
+      }));
+      if (items.length > 0) blocks.push({ heading, items });
+      continue;
+    }
+
+    if (section.type === "CUSTOM") {
+      const content = section.content as CustomContent;
+      const items = content.items.map((item) => ({
+        primary: item.title || undefined,
+        secondary: joined([item.subtitle, item.date], " · "),
+        body: item.description || undefined,
       }));
       if (items.length > 0) blocks.push({ heading, items });
     }

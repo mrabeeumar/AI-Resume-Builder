@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/container";
 import { AtsReportView } from "@/components/resume/ats-report";
 import { ResumeServiceError } from "@/services/resume.service";
 import { getResumeForUser } from "@/services/resume.service";
+import { listAtsReportsForResume } from "@/services/ats.service";
 
 export const metadata: Metadata = {
   title: "ATS report | ResoVo",
@@ -24,8 +25,10 @@ export default async function AtsReportPage({ params }: PageParams) {
   const { id } = await params;
 
   let resume;
+  let reports;
   try {
     resume = await getResumeForUser(id, session.user.id);
+    reports = await listAtsReportsForResume(id, session.user.id);
   } catch (error) {
     if (error instanceof ResumeServiceError && error.status === 404) {
       notFound();
@@ -53,7 +56,7 @@ export default async function AtsReportPage({ params }: PageParams) {
             missing sections, and get actionable suggestions.
           </p>
         </div>
-        <AtsReportView resumeId={id} />
+        <AtsReportView resumeId={id} initialReports={reports} />
       </Container>
     </main>
   );
