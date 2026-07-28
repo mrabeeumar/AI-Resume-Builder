@@ -18,16 +18,11 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [needsVerification, setNeedsVerification] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [resent, setResent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setNeedsVerification(false);
-    setResent(false);
 
     const parsed = loginSchema.safeParse({ email, password });
     if (!parsed.success) {
@@ -44,12 +39,7 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        if (result.code === "email-not-verified") {
-          setNeedsVerification(true);
-          setError("Please verify your email address before signing in.");
-        } else {
-          setError("Invalid email or password.");
-        }
+        setError("Invalid email or password.");
         return;
       }
 
@@ -59,20 +49,6 @@ export function LoginForm() {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleResendVerification = async () => {
-    setIsResending(true);
-    try {
-      await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      setResent(true);
-    } finally {
-      setIsResending(false);
     }
   };
 
@@ -115,21 +91,6 @@ export function LoginForm() {
           {error}
         </p>
       )}
-      {needsVerification &&
-        (resent ? (
-          <p className="text-muted-foreground text-sm">
-            Verification email resent. Please check your inbox.
-          </p>
-        ) : (
-          <button
-            type="button"
-            onClick={handleResendVerification}
-            disabled={isResending}
-            className="text-primary hover:text-primary/80 text-left text-sm font-medium underline underline-offset-4 transition-colors"
-          >
-            {isResending ? "Resending..." : "Resend verification email"}
-          </button>
-        ))}
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Signing in..." : "Sign in"}
       </Button>

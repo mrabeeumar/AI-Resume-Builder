@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,12 +10,12 @@ import { Label } from "@/components/ui/label";
 import { registerSchema } from "@/types/auth";
 
 export function RegisterForm() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registered, setRegistered] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,22 +41,25 @@ export function RegisterForm() {
         return;
       }
 
-      setRegistered(true);
+      const result = await signIn("credentials", {
+        email: parsed.data.email,
+        password: parsed.data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        router.push("/login");
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (registered) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        We&apos;ve sent a verification link to {email}. Please check your
-        inbox to activate your account before signing in.
-      </p>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
