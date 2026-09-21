@@ -5,7 +5,7 @@ import type {
   AIProvider,
 } from "@/lib/ai/provider";
 
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+const DEFAULT_MODEL = "openai/gpt-oss-120b";
 const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 type GroqResponse = {
